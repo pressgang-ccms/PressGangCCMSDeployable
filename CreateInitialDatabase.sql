@@ -45,6 +45,10 @@ DELETE FROM PressGang.PropertyTagCategory;
 
 DELETE FROM PressGang.PropertyTagCategory_AUD;
 
+DELETE FROM PressGang.PropertyTagToPropertyTagCategory;
+
+DELETE FROM PressGang.PropertyTagToPropertyTagCategory_AUD;
+
 DELETE FROM PressGang.TopicToPropertyTag;
 
 DELETE FROM PressGang.TopicToPropertyTag_AUD;
