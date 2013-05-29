@@ -1,9 +1,10 @@
+# Create the initial database schema
 # CREATE SCHEMA PressGang;
 
+# Dump the table structure from the live database into the initial database
 # dump -uroot --no-data Skynet |  -uroot -A -DPressGang
 
- 
-
+# The IDs of the database records that will be part of the initial database
 SET @TopicIDs = '14591,14591,14591,12510,12683,12559,12560,12587,12588,12589,12592,12556,12558,13434,13581,13582,13583,13663,13664,13664,13742,13743,13744,13598,13600,13584,13585,13585,13587,13588,13589,13590,13591,13592,13593,13594,13595,13596,13653,13654';	
 
 SET @TagIDs = '4,5,6,268,315,540,598,599';
@@ -17,7 +18,7 @@ SET @StringConstantsIDs = '1,2,3,4,5,6,16,17,18,19,20,21,22,23,24,31,32,33,34,35
 SET @BlobConstantsIDs = '1,2,3,4,5,9';
 
 
-
+# Clean up the initial database
 DELETE FROM PressGang.Topic;
 
 DELETE FROM PressGang.Topic_AUD;
@@ -85,7 +86,7 @@ DELETE FROM PressGang.DATABASECHANGELOG;
 DELETE FROM PressGang.DATABASECHANGELOGLOCK;
 
 
-
+# Copy the contents of the live database
 INSERT INTO `PressGang`.`DATABASECHANGELOG`
 
 (`ID`,
@@ -1018,10 +1019,7 @@ INSERT INTO `PressGang`.`TagToPropertyTag_AUD`
 
 );
 
-
-
-
-
+# Any new records start at 100000
 ALTER TABLE PressGang.PropertyTagCategory AUTO_INCREMENT = 100000;
 
 ALTER TABLE PressGang.PropertyTag AUTO_INCREMENT = 100000;
