@@ -2,9 +2,11 @@
 # CREATE SCHEMA PressGang;
 
 # Dump the table structure from the live database into the initial database
-# dump -uroot --no-data Skynet |  -uroot -A -DPressGang
+# mysqldump -uroot --no-data Skynet | mysql -uroot -A -DPressGang
 
 # The IDs of the database records that will be part of the initial database
+SET @PressGangTag = 540;
+
 SET @TopicIDs = '14591,14591,14591,12510,12683,12559,12560,12587,12588,12589,12592,12556,12558,13434,13581,13582,13583,13663,13664,13664,13742,13743,13744,13598,13600,13584,13585,13585,13587,13588,13589,13590,13591,13592,13593,13594,13595,13596,13653,13654';	
 
 SET @TagIDs = '4,5,6,268,315,540,598,599';
@@ -88,6 +90,10 @@ DELETE FROM PressGang.LanguageImage_AUD;
 DELETE FROM PressGang.User;
 
 DELETE FROM PressGang.User_AUD;
+
+DELETE FROM PressGang.TopicSecondOrderData;
+
+DELETE FROM PressGang.TopicSecondOrderData_AUD;
 
 DELETE FROM PressGang.REVINFO;
 
@@ -246,6 +252,8 @@ INSERT INTO PressGang.Topic (TopicID, TopicTitle, TopicText, TopicTimeStamp, Top
 	FROM Skynet.Topic
 
 	WHERE FIND_IN_SET(TopicID, @TopicIDs)
+    
+    OR EXISTS (SELECT 1 FROM Skynet.TopicToTag WHERE TagID = @PressGangTag AND Topic.TopicID = TopicToTag.TopicID)
 
 );
 
@@ -260,6 +268,8 @@ INSERT INTO PressGang.Topic_AUD (TopicID, REV, REVTYPE, TopicTitle, TopicText, T
 	FROM Skynet.Topic
 
 	WHERE FIND_IN_SET(TopicID, @TopicIDs)
+
+    OR EXISTS (SELECT 1 FROM Skynet.TopicToTag WHERE TagID = @PressGangTag AND Topic.TopicID = TopicToTag.TopicID)
 
 );
 
@@ -323,7 +333,9 @@ INSERT INTO `PressGang`.`TopicToTag`
 
     FROM Skynet.TopicToTag
 
-    WHERE FIND_IN_SET(TagID, @TagIDs)
+    WHERE (FIND_IN_SET(TagID, @TagIDs)
+
+    OR TagID = @PressGangTag)
 
     AND FIND_IN_SET(TopicID, @TopicIDs)
 
@@ -349,19 +361,15 @@ INSERT INTO `PressGang`.`TopicToTag_AUD`
 
     SELECT TopicToTagID, 1, 0, TopicID, TagID
 
-    FROM Skynet.TopicToTag_AUD
+    FROM Skynet.TopicToTag
 
-    WHERE FIND_IN_SET(TagID, @TagIDs)
+    WHERE (FIND_IN_SET(TagID, @TagIDs)
+
+    OR TagID = @PressGangTag)
 
     AND FIND_IN_SET(TopicID, @TopicIDs)
 
 );
-
-
-
-
-
-
 
 INSERT INTO PressGang.Category
 
@@ -384,8 +392,6 @@ MutuallyExclusive)
     WHERE FIND_IN_SET(CategoryID, @CategoryIDs)
 
 );
-
-
 
 INSERT INTO PressGang.Category_AUD
 
@@ -413,8 +419,6 @@ MutuallyExclusive)
 
 );
 
-
-
 INSERT INTO PressGang.TagToCategory
 
 (TagToCategoryID,
@@ -436,8 +440,6 @@ Sorting)
     AND FIND_IN_SET(CategoryID, @CategoryIDs)
 
 );
-
-
 
 INSERT INTO PressGang.TagToCategory_AUD
 
@@ -465,8 +467,6 @@ TagID)
 
 );
 
-
-
 INSERT INTO PressGang.Project
 
 (ProjectID,
@@ -484,8 +484,6 @@ ProjectDescription)
     WHERE FIND_IN_SET(ProjectID, @ProjectIDs)
 
 );
-
-
 
 INSERT INTO PressGang.Project_AUD
 
@@ -509,8 +507,6 @@ ProjectDescription)
 
 );
 
-
-
 INSERT INTO PressGang.TagToProject
 
 (TagToProjectID,
@@ -530,8 +526,6 @@ TagID)
     AND FIND_IN_SET(TagID, @TagIDs)
 
 );
-
-
 
 INSERT INTO PressGang.TagToProject_AUD
 
