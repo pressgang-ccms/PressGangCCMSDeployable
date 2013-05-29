@@ -242,7 +242,7 @@ INSERT INTO `PressGang`.`User_AUD`
     WHERE FIND_IN_SET(UserID, @UserIDs)
 );
  
-
+# Insert all topics that have been explicitly identified, as well as any tagged with @PressGangTag
 INSERT INTO PressGang.Topic (TopicID, TopicTitle, TopicText, TopicTimeStamp, TopicXML, TopicLocale, TopicXMLDoctype) 
 
 (
@@ -354,9 +354,6 @@ INSERT INTO `PressGang`.`TopicToTag_AUD`
 `TagID`,
 
 `TopicID`)
-
-
-
 (
 
     SELECT TopicToTagID, 1, 0, TopicID, TagID
