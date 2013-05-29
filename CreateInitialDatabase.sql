@@ -221,7 +221,6 @@ INSERT INTO `PressGang`.`User_AUD`
 `REVTYPE`,
 `Description`,
 `UserName`)
-VALUES
 (
     SELECT 
     `UserID`,
