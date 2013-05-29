@@ -613,7 +613,7 @@ INSERT INTO PressGang.BlobConstants
 
     FROM Skynet.BlobConstants
 
-    WHERE FIND_IN_SET(BlobConstantsID, @StringConstantsIDs)
+    WHERE FIND_IN_SET(BlobConstantsID, @BlobConstantsIDs)
 
 );
 
@@ -629,7 +629,7 @@ INSERT INTO PressGang.BlobConstants_AUD
 
     FROM Skynet.BlobConstants
 
-    WHERE FIND_IN_SET(BlobConstantsID, @StringConstantsIDs)
+    WHERE FIND_IN_SET(BlobConstantsID, @BlobConstantsIDs)
 
 );
 
