@@ -943,7 +943,7 @@ INSERT INTO `PressGang`.`TopicToPropertyTag`
 
     FROM Skynet.TopicToPropertyTag
 
-    AND EXISTS (SELECT 1 FROM PressGang.Topic WHERE PressGang.Topic.TopicID = Skynet.TopicToTag.TopicID) 
+    WHERE EXISTS (SELECT 1 FROM PressGang.Topic WHERE PressGang.Topic.TopicID = Skynet.TopicToPropertyTag.TopicID) 
 
 );
 
@@ -981,7 +981,7 @@ INSERT INTO `PressGang`.`TopicToPropertyTag_AUD`
 
     FROM Skynet.TopicToPropertyTag
 
-    AND EXISTS (SELECT 1 FROM PressGang.Topic WHERE PressGang.Topic.TopicID = Skynet.TopicToTag.TopicID)
+    WHERE EXISTS (SELECT 1 FROM PressGang.Topic WHERE PressGang.Topic.TopicID = Skynet.TopicToPropertyTag.TopicID)
 
 );
 
