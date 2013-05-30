@@ -337,9 +337,7 @@ INSERT INTO `PressGang`.`TopicToTag`
 
     OR TagID = @PressGangTag)
 
-    AND (FIND_IN_SET(TopicID, @TopicIDs)
-    
-    OR EXISTS (SELECT 1 FROM Skynet.TopicToTag WHERE TagID = @PressGangTag AND Topic.TopicID = TopicToTag.TopicID))
+    AND EXISTS (SELECT 1 FROM PressGang.Topic WHERE PressGang.Topic.TopicID = Skynet.TopicToTag.TopicID)
 
 );
 
@@ -366,10 +364,7 @@ INSERT INTO `PressGang`.`TopicToTag_AUD`
 
     OR TagID = @PressGangTag)
 
-    AND (FIND_IN_SET(TopicID, @TopicIDs)
-    
-    OR EXISTS (SELECT 1 FROM Skynet.TopicToTag WHERE TagID = @PressGangTag AND Topic.TopicID = TopicToTag.TopicID))
-
+    AND EXISTS (SELECT 1 FROM PressGang.Topic WHERE PressGang.Topic.TopicID = Skynet.TopicToTag.TopicID)
 );
 
 INSERT INTO PressGang.Category
