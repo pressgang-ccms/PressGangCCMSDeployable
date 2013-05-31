@@ -738,17 +738,17 @@ INSERT INTO `PressGang`.`PropertyTag_AUD`
 
     SELECT `PropertyTagID`,
 
-    1, 
+    1,
 
     0,
 
-    `PropertyTagName`,
+    `PropertyTagCanBeNull`,
 
     `PropertyTagDescription`,
 
-    `PropertyTagRegex`,
+    `PropertyTagName`,
 
-    `PropertyTagCanBeNull`,
+    `PropertyTagRegex`,
 
     `PropertyTagIsUnique`
 
@@ -880,25 +880,11 @@ INSERT INTO `PressGang`.`PropertyTagToPropertyTagCategory_AUD`
 
 INSERT INTO `PressGang`.`TopicToPropertyTag`
 
-(`TopicToPropertyTagID`,
-
-`TopicID`,
-
-`PropertyTagID`,
-
-`Value`)
+(`TopicToPropertyTagID`, `TopicID`, `PropertyTagID`, `Value`)
 
 (
 
-    SELECT 
-
-    `TopicToPropertyTagID`,
-
-    `TopicID`,
-
-    `PropertyTagID`,
-
-    `Value`
+    SELECT `TopicToPropertyTagID`, `TopicID`, `PropertyTagID`, `Value`
 
     FROM Skynet.TopicToPropertyTag
 
@@ -910,17 +896,7 @@ INSERT INTO `PressGang`.`TopicToPropertyTag`
 
 INSERT INTO `PressGang`.`TopicToPropertyTag_AUD`
 
-(`TopicToPropertyTagID`,
-
-`REV`,
-
-`REVTYPE`,
-
-`Value`,
-
-`PropertyTagID`,
-
-`TopicID`)
+(`TopicToPropertyTagID`, `REV`, `REVTYPE`, `Value`, `PropertyTagID`, `TopicID`)
 
 (
 
