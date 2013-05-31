@@ -341,7 +341,7 @@ INSERT INTO `PressGang`.`TopicToTag_AUD`
 `TopicID`)
 (
 
-    SELECT TopicToTagID, 1, 0, TopicID, TagID
+    SELECT TopicToTagID, 1, 0, TopicID, TagID, TopicID
 
     FROM PressGang.TopicToTag
 );
