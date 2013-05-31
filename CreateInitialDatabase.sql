@@ -229,7 +229,11 @@ INSERT INTO `PressGang`.`User_AUD`
 `Description`,
 `UserName`)
 (
-    SELECT `UserID`, 1, 0, `UserName`, `Description`
+    SELECT `UserID`,
+    1,
+    0,
+    `Description`,
+    `UserName`
     FROM PressGang.User
 );
  
@@ -296,7 +300,15 @@ TagName)
 
 (
 
-    SELECT TagID, 1, 0, TagName, TagDescription
+    SELECT TagID,
+
+    1,
+
+    0,
+
+    TagDescription,
+
+    TagName
 
     FROM PressGang.Tag
 
@@ -386,7 +398,19 @@ MutuallyExclusive)
 
 (
 
-    SELECT CategoryID, 1, 0, CategoryName, CategoryDescription, CategorySort, MutuallyExclusive
+    SELECT CategoryID,
+
+    1,
+
+    0,
+
+    CategoryDescription,
+
+    CategoryName,
+
+    CategorySort,
+
+    MutuallyExclusive
 
     FROM PressGang.Category
 
@@ -430,7 +454,17 @@ TagID)
 
 (
 
-    SELECT TagToCategoryID, 1, 0, TagID, CategoryID, Sorting
+    SELECT TagToCategoryID,
+
+    1,
+
+    0,
+
+    Sorting,
+
+    CategoryID,
+
+    TagID
 
     FROM PressGang.TagToCategory
 
@@ -674,7 +708,23 @@ INSERT INTO PressGang.LanguageImage_AUD
 
 (
 
-    SELECT `LanguageImageID`, 1, 0, `ImageFileID`, `ThumbnailData`, `ImageDataBase64`, `Locale`, `OriginalFileName`, `ImageData`
+    SELECT `LanguageImageID`,
+
+    1,
+
+    0,
+
+    `ImageData`,
+
+    `ImageDataBase64`,
+
+    `Locale`,
+
+    `OriginalFileName`,
+
+    `ThumbnailData`,
+
+    `ImageFileID`
 
     FROM PressGang.LanguageImage
 
@@ -796,17 +846,15 @@ INSERT INTO `PressGang`.`PropertyTagCategory_AUD`
 
 (
 
-    SELECT 
-
-    `PropertyTagCategoryID`,
+    SELECT `PropertyTagCategoryID`,
 
     1,
 
     0,
 
-    `PropertyTagCategoryName`,
+    `PropertyTagCategoryDescription`,
 
-    `PropertyTagCategoryDescription`
+    `PropertyTagCategoryName`
 
     FROM PressGang.PropertyTagCategory
 
@@ -858,19 +906,17 @@ INSERT INTO `PressGang`.`PropertyTagToPropertyTagCategory_AUD`
 
 (
 
-    SELECT 
-
-    `PropertyTagToPropertyTagCategoryID`,
+    SELECT `PropertyTagToPropertyTagCategoryID`,
 
     1,
 
     0,
 
+    `Sorting`,
+
     `PropertyTagID`,
 
-    `PropertyTagCategoryID`,
-
-    `Sorting`
+    `PropertyTagCategoryID`
 
     FROM PressGang.PropertyTagToPropertyTagCategory
 
@@ -958,11 +1004,11 @@ INSERT INTO `PressGang`.`TagToPropertyTag_AUD`
 
     0,
 
-    `TagID`,    
+    `Value`,
 
     `PropertyTagID`,
 
-    `Value`
+    `TagID`
 
     FROM PressGang.TagToPropertyTag
 
