@@ -217,10 +217,7 @@ INSERT INTO `PressGang`.`User`
 `UserName`,
 `Description`)
 (
-    SELECT 
-    `UserID`,
-    `UserName`,
-    `Description`
+    SELECT `UserID`, `UserName`, `Description`
     FROM Skynet.User
     WHERE FIND_IN_SET(UserID, @UserIDs)
 );
@@ -232,14 +229,8 @@ INSERT INTO `PressGang`.`User_AUD`
 `Description`,
 `UserName`)
 (
-    SELECT 
-    `UserID`,
-    1,
-    0,
-    `UserName`,
-    `Description`
-    FROM Skynet.User
-    WHERE FIND_IN_SET(UserID, @UserIDs)
+    SELECT `UserID`, 1, 0, `UserName`, `Description`
+    FROM PressGang.User
 );
  
 # Insert all topics that have been explicitly identified, as well as any tagged with @PressGangTag
@@ -265,11 +256,7 @@ INSERT INTO PressGang.Topic_AUD (TopicID, REV, REVTYPE, TopicTitle, TopicText, T
 
 	SELECT TopicID, 1, 0, TopicTitle, TopicText, MAKEDATE(2013, 1), TopicXML, TopicLocale, TopicXMLDoctype
 
-	FROM Skynet.Topic
-
-	WHERE FIND_IN_SET(TopicID, @TopicIDs)
-
-    OR EXISTS (SELECT 1 FROM Skynet.TopicToTag WHERE TagID = @PressGangTag AND Topic.TopicID = TopicToTag.TopicID)
+	FROM PressGang.Topic
 
 );
 
@@ -311,9 +298,7 @@ TagName)
 
     SELECT TagID, 1, 0, TagName, TagDescription
 
-    FROM Skynet.Tag
-
-    WHERE FIND_IN_SET(TagID, @TagIDs)
+    FROM PressGang.Tag
 
 );
 
@@ -358,13 +343,7 @@ INSERT INTO `PressGang`.`TopicToTag_AUD`
 
     SELECT TopicToTagID, 1, 0, TopicID, TagID
 
-    FROM Skynet.TopicToTag
-
-    WHERE (FIND_IN_SET(TagID, @TagIDs)
-
-    OR TagID = @PressGangTag)
-
-    AND EXISTS (SELECT 1 FROM PressGang.Topic WHERE PressGang.Topic.TopicID = Skynet.TopicToTag.TopicID)
+    FROM PressGang.TopicToTag
 );
 
 INSERT INTO PressGang.Category
@@ -409,9 +388,7 @@ MutuallyExclusive)
 
     SELECT CategoryID, 1, 0, CategoryName, CategoryDescription, CategorySort, MutuallyExclusive
 
-    FROM Skynet.Category
-
-    WHERE FIND_IN_SET(CategoryID, @CategoryIDs)
+    FROM PressGang.Category
 
 );
 
@@ -455,11 +432,7 @@ TagID)
 
     SELECT TagToCategoryID, 1, 0, TagID, CategoryID, Sorting
 
-    FROM Skynet.TagToCategory
-
-    WHERE FIND_IN_SET(TagID, @TagIDs)
-
-    AND FIND_IN_SET(CategoryID, @CategoryIDs)
+    FROM PressGang.TagToCategory
 
 );
 
@@ -497,9 +470,7 @@ ProjectDescription)
 
     SELECT ProjectID, 1, 0, ProjectName, ProjectDescription
 
-    FROM Skynet.Project
-
-    WHERE FIND_IN_SET(ProjectID, @ProjectIDs)
+    FROM PressGang.Project
 
 );
 
@@ -539,11 +510,7 @@ TagID)
 
     SELECT TagToProjectID, 1, 0, ProjectID, TagID
 
-    FROM Skynet.TagToProject
-
-    WHERE FIND_IN_SET(ProjectID, @ProjectIDs)
-
-    AND FIND_IN_SET(TagID, @TagIDs)
+    FROM PressGang.TagToProject
 
 );
 
@@ -585,9 +552,7 @@ ConstantValue)
 
     SELECT StringConstantsID, 1, 0, ConstantName, ConstantValue
 
-    FROM Skynet.StringConstants
-
-    WHERE FIND_IN_SET(StringConstantsID, @StringConstantsIDs)
+    FROM PressGang.StringConstants
 
 );
 
@@ -617,9 +582,7 @@ INSERT INTO PressGang.BlobConstants_AUD
 
     SELECT BlobConstantsID, 1, 0, ConstantName, ConstantValue
 
-    FROM Skynet.BlobConstants
-
-    WHERE FIND_IN_SET(BlobConstantsID, @BlobConstantsIDs)
+    FROM PressGang.BlobConstants
 
 );
 
@@ -655,9 +618,7 @@ Description)
 
     SELECT ImageFileID, 1, 0, Description
 
-    FROM Skynet.ImageFile
-
-    WHERE EXISTS (SELECT * FROM PressGang.Topic WHERE TopicXML LIKE CONCAT('%images/', ImageFileID, '.png%'))
+    FROM PressGang.ImageFile
 
 );
 
@@ -715,9 +676,7 @@ INSERT INTO PressGang.LanguageImage_AUD
 
     SELECT `LanguageImageID`, 1, 0, `ImageFileID`, `ThumbnailData`, `ImageDataBase64`, `Locale`, `OriginalFileName`, `ImageData`
 
-    FROM Skynet.LanguageImage
-
-    WHERE ImageFileID IN (SELECT ImageFileID FROM PressGang.ImageFile)
+    FROM PressGang.LanguageImage
 
 );
 
@@ -793,7 +752,7 @@ INSERT INTO `PressGang`.`PropertyTag_AUD`
 
     `PropertyTagIsUnique`
 
-    FROM Skynet.PropertyTag
+    FROM PressGang.PropertyTag
 
 );
 
@@ -849,7 +808,7 @@ INSERT INTO `PressGang`.`PropertyTagCategory_AUD`
 
     `PropertyTagCategoryDescription`
 
-    FROM Skynet.PropertyTagCategory
+    FROM PressGang.PropertyTagCategory
 
 );
 
@@ -913,7 +872,7 @@ INSERT INTO `PressGang`.`PropertyTagToPropertyTagCategory_AUD`
 
     `Sorting`
 
-    FROM Skynet.PropertyTagToPropertyTagCategory
+    FROM PressGang.PropertyTagToPropertyTagCategory
 
 );
 
@@ -979,9 +938,7 @@ INSERT INTO `PressGang`.`TopicToPropertyTag_AUD`
 
     `Value`
 
-    FROM Skynet.TopicToPropertyTag
-
-    WHERE EXISTS (SELECT 1 FROM PressGang.Topic WHERE PressGang.Topic.TopicID = Skynet.TopicToPropertyTag.TopicID)
+    FROM PressGang.TopicToPropertyTag
 
 );
 
@@ -1043,9 +1000,7 @@ INSERT INTO `PressGang`.`TagToPropertyTag_AUD`
 
     `Value`
 
-    FROM Skynet.TagToPropertyTag
-
-    WHERE FIND_IN_SET(TagID, @TagIDs)
+    FROM PressGang.TagToPropertyTag
 
 );
 
@@ -1069,3 +1024,5 @@ ALTER TABLE PressGang.LanguageImage AUTO_INCREMENT = 100000;
 ALTER TABLE PressGang.Topic AUTO_INCREMENT = 100000;
 
 ALTER TABLE PressGang.Tag AUTO_INCREMENT = 100000;
+
+ALTER TABLE PressGang.REVINFO AUTO_INCREMENT = 100000;
