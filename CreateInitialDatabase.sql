@@ -924,21 +924,7 @@ INSERT INTO `PressGang`.`TopicToPropertyTag_AUD`
 
 (
 
-    SELECT 
-
-    `TopicToPropertyTagID`,
-
-    1,
-
-    0,    
-
-    `Value`.    
-
-    `PropertyTagID`,
-
-    `TopicID`
-
-    
+    SELECT `TopicToPropertyTagID`, 1, 0, `Value`, `PropertyTagID`, `TopicID`
 
     FROM PressGang.TopicToPropertyTag
 
