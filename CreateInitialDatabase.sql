@@ -930,13 +930,15 @@ INSERT INTO `PressGang`.`TopicToPropertyTag_AUD`
 
     1,
 
-    0,
+    0,    
 
-    `TopicID`,
+    `Value`.    
 
     `PropertyTagID`,
 
-    `Value`
+    `TopicID`
+
+    
 
     FROM PressGang.TopicToPropertyTag
 
