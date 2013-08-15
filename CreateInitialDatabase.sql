@@ -2,12 +2,12 @@
 # CREATE SCHEMA PressGang;
 
 # Dump the table structure from the live database into the initial database
-# mysqldump -uroot --no-data Skynet | mysql -uroot -A -DPressGang
+# mysqldump -uroot -ppassword --no-data Skynet | mysql -ppassword -uroot -A -DPressGang
 
 # The IDs of the database records that will be part of the initial database
 SET @PressGangTag = 540;
 
-SET @TopicIDs = '14591,14591,14591,12510,12683,12559,12560,12587,12588,12589,12592,12556,12558,13434,13581,13582,13583,13663,13664,13664,13742,13743,13744,13598,13600,13584,13585,13585,13587,13588,13589,13590,13591,13592,13593,13594,13595,13596,13653,13654';	
+SET @ContentSpecIDs = '13968';
 
 SET @TagIDs = '4,5,6,268,315,540,598,599';
 
@@ -93,7 +93,47 @@ DELETE FROM PressGang.User_AUD;
 
 DELETE FROM PressGang.TopicSecondOrderData;
 
-DELETE FROM PressGang.TopicSecondOrderData_AUD;
+#DELETE FROM PressGang.TopicSecondOrderData_AUD;
+
+DELETE FROM PressGang.CSNodeToCSNode;
+
+DELETE FROM PressGang.CSNodeToCSNode_AUD;
+
+DELETE FROM PressGang.CSNodeToPropertyTag;
+
+DELETE FROM PressGang.CSNodeToPropertyTag_AUD;
+
+DELETE FROM PressGang.ContentSpec;
+
+DELETE FROM PressGang.ContentSpec_AUD;
+
+DELETE FROM PressGang.ContentSpecNode;
+
+DELETE FROM PressGang.ContentSpecNode_AUD;
+
+DELETE FROM PressGang.ContentSpecToPropertyTag;
+
+DELETE FROM PressGang.ContentSpecToPropertyTag_AUD;
+
+DELETE FROM PressGang.ContentSpecToTag;
+
+DELETE FROM PressGang.ContentSpecToTag_AUD;
+
+DELETE FROM PressGang.TranslatedCSNode;
+
+DELETE FROM PressGang.TranslatedCSNode_AUD;
+
+DELETE FROM PressGang.TranslatedCSNodeString;
+
+DELETE FROM PressGang.TranslatedCSNodeString_AUD;
+
+DELETE FROM PressGang.TranslatedContentSpec;
+
+DELETE FROM PressGang.TranslatedContentSpec_AUD;
+
+DELETE FROM PressGang.File;
+
+DELETE FROM PressGang.File_AUD;
 
 DELETE FROM PressGang.REVINFO;
 
@@ -237,7 +277,7 @@ INSERT INTO `PressGang`.`User_AUD`
     FROM PressGang.User
 );
  
-# Insert all topics that have been explicitly identified, as well as any tagged with @PressGangTag
+# Insert all topics that have been tagged with @PressGangTag
 INSERT INTO PressGang.Topic (TopicID, TopicTitle, TopicText, TopicTimeStamp, TopicXML, TopicLocale, TopicXMLDoctype) 
 
 (
@@ -246,9 +286,7 @@ INSERT INTO PressGang.Topic (TopicID, TopicTitle, TopicText, TopicTimeStamp, Top
 
 	FROM Skynet.Topic
 
-	WHERE FIND_IN_SET(TopicID, @TopicIDs)
-    
-    OR EXISTS (SELECT 1 FROM Skynet.TopicToTag WHERE TagID = @PressGangTag AND Topic.TopicID = TopicToTag.TopicID)
+	WHERE EXISTS (SELECT 1 FROM Skynet.TopicToTag WHERE TagID = @PressGangTag AND Topic.TopicID = TopicToTag.TopicID)
 
 );
 
@@ -281,6 +319,8 @@ TagDescription)
     FROM Skynet.Tag
 
     WHERE FIND_IN_SET(TagID, @TagIDs)
+    
+    OR TagID IN (SELECT TagID FROM Skynet.ContentSpecToTag)
 
 );
 
@@ -1014,6 +1054,275 @@ INSERT INTO `PressGang`.`TagToPropertyTag_AUD`
 
 );
 
+INSERT INTO `PressGang`.`ContentSpec`
+(`ContentSpecID`,
+`ContentSpecType`,
+`LastPublished`,
+`LastModified`,
+`Locale`,
+`GlobalCondition`,
+`Errors`,
+`FailedSpec`)
+
+(
+    SELECT `ContentSpecID`,
+        `ContentSpecType`,
+        `LastPublished`,
+        `LastModified`,
+        `Locale`,
+        `GlobalCondition`,
+        `Errors`,
+        `FailedSpec`
+    FROM Skynet.ContentSpec
+    WHERE FIND_IN_SET(ContentSpecID, @ContentSpecIDs) 
+);
+
+INSERT INTO `PressGang`.`ContentSpec_AUD`
+(`ContentSpecID`,
+`REV`,
+`REVTYPE`,
+`ContentSpecType`,
+`LastPublished`,
+`LastModified`,
+`Locale`,
+`GlobalCondition`,
+`Errors`,
+`FailedSpec`)
+
+(
+
+   SELECT `ContentSpecID`,
+
+    1,
+
+    0,
+
+    `ContentSpecType`,
+
+    `LastPublished`,
+
+    `LastModified`,
+    
+    `Locale`,
+    
+    `GlobalCondition`,
+    
+    `Errors`,
+    
+    `FailedSpec`
+
+    FROM PressGang.ContentSpec
+);
+
+INSERT INTO `PressGang`.`ContentSpecNode`
+(`ContentSpecNodeID`,
+`NodeTitle`,
+`NodeTargetID`,
+`NodeType`,
+`NodeCondition`,
+`AdditionalText`,
+`EntityID`,
+`EntityRevision`,
+`ContentSpecID`,
+`ParentID`,
+`NextNodeID`)
+
+(
+
+	SELECT `ContentSpecNodeID`,
+		`NodeTitle`,
+		`NodeTargetID`,
+		`NodeType`,
+		`NodeCondition`,
+		`AdditionalText`,
+		`EntityID`,
+		`EntityRevision`,
+		`ContentSpecID`,
+		`ParentID`,
+		`NextNodeID`
+	FROM Skynet.ContentSpecNode
+	WHERE FIND_IN_SET(ContentSpecID, @ContentSpecIDs)
+
+);
+
+INSERT INTO `PressGang`.`ContentSpecNode_AUD`
+(`ContentSpecNodeID`,
+`REV`,
+`REVTYPE`,
+`NodeTitle`,
+`NodeTargetID`,
+`NodeType`,
+`NodeCondition`,
+`AdditionalText`,
+`EntityID`,
+`EntityRevision`,
+`ContentSpecID`,
+`ParentID`,
+`NextNodeID`)
+
+(
+
+	SELECT `ContentSpecNodeID`,
+		1,
+		0,
+		`NodeTitle`,
+		`NodeTargetID`,
+		`NodeType`,
+		`NodeCondition`,
+		`AdditionalText`,
+		`EntityID`,
+		`EntityRevision`,
+		`ContentSpecID`,
+		`ParentID`,
+		`NextNodeID`
+	FROM PressGang.ContentSpecNode
+);
+
+INSERT INTO `PressGang`.`CSNodeToCSNode`
+(`CSNodeToCSNodeID`,
+`MainNodeID`,
+`RelatedNodeID`,
+`RelationshipType`,
+`Sort`)
+
+(
+	SELECT `CSNodeToCSNodeID`,
+		`MainNodeID`,
+		`RelatedNodeID`,
+		`RelationshipType`,
+		`Sort`
+	FROM Skynet.CSNodeToCSNode
+	WHERE MainNodeID IN (SELECT ContentSpecNodeID FROM PressGang.ContentSpecNode)
+	OR RelatedNodeID IN (SELECT ContentSpecNodeID FROM PressGang.ContentSpecNode)
+);
+
+INSERT INTO `PressGang`.`CSNodeToCSNode_AUD`
+(`CSNodeToCSNodeID`,
+`REV`,
+`REVTYPE`,
+`MainNodeID`,
+`RelatedNodeID`,
+`RelationshipType`,
+`Sort`)
+
+(
+
+	SELECT `CSNodeToCSNodeID`,
+		1,
+		0,
+		`MainNodeID`,
+		`RelatedNodeID`,
+		`RelationshipType`,
+		`Sort`
+	FROM PressGang.CSNodeToCSNode
+);
+
+INSERT INTO `PressGang`.`CSNodeToPropertyTag`
+(`CSNodeToPropertyTagID`,
+`CSNodeID`,
+`PropertyTagID`,
+`Value`)
+
+(
+	SELECT `CSNodeToPropertyTagID`,
+		`CSNodeID`,
+		`PropertyTagID`,
+		`Value`
+	FROM Skynet.CSNodeToPropertyTag
+	WHERE CSNodeID IN (SELECT ContentSpecNodeID FROM PressGang.ContentSpecNode) 
+);
+
+INSERT INTO `PressGang`.`CSNodeToPropertyTag_AUD`
+(`CSNodeToPropertyTagID`,
+`REV`,
+`REVTYPE`,
+`CSNodeID`,
+`PropertyTagID`,
+`Value`)
+
+(
+	SELECT `CSNodeToPropertyTagID`,
+		1,
+		0,
+		`CSNodeID`,
+		`PropertyTagID`,
+		`Value`
+	FROM PressGang.CSNodeToPropertyTag
+);
+
+INSERT INTO `PressGang`.`ContentSpecToPropertyTag`
+(`ContentSpecToPropertyTagID`,
+`ContentSpecID`,
+`PropertyTagID`,
+`Value`)
+
+(
+	SELECT `ContentSpecToPropertyTagID`,
+		`ContentSpecID`,
+		`PropertyTagID`,
+		`Value`
+	FROM Skynet.ContentSpecToPropertyTag
+	WHERE ContentSpecID IN (SELECT ContentSpecID FROM PressGang.ContentSpec) 
+);
+
+INSERT INTO `PressGang`.`ContentSpecToPropertyTag_AUD`
+(`ContentSpecToPropertyTagID`,
+`REV`,
+`REVTYPE`,
+`ContentSpecID`,
+`PropertyTagID`,
+`Value`)
+
+(
+	SELECT `ContentSpecToPropertyTagID`,
+		1,
+		0,
+		`ContentSpecID`,
+		`PropertyTagID`,
+		`Value`
+	FROM PressGang.ContentSpecToPropertyTag
+);
+
+INSERT INTO `PressGang`.`ContentSpecToTag`
+(`ContentSpecToTagID`,
+`ContentSpecID`,
+`TagID`,
+`BookTag`)
+
+(
+	SELECT `ContentSpecToTagID`,
+		`ContentSpecID`,
+		`TagID`,
+		`BookTag`
+	FROM Skynet.ContentSpecToTag
+	WHERE ContentSpecID IN (SELECT ContentSpecID FROM PressGang.ContentSpec) 
+);
+
+INSERT INTO `PressGang`.`ContentSpecToTag_AUD`
+(`ContentSpecToTagID`,
+`REV`,
+`REVTYPE`,
+`ContentSpecID`,
+`TagID`,
+`BookTag`)
+
+(
+	SELECT `ContentSpecToTagID`,
+		1,
+		0,
+		`ContentSpecID`,
+		`TagID`,
+		`BookTag`
+	FROM PressGang.ContentSpecToTag
+);
+
+#PressGang.TranslatedContentSpec;
+#PressGang.TranslatedContentSpec_AUD;
+#PressGang.TranslatedCSNode;
+#PressGang.TranslatedCSNode_AUD;
+#PressGang.TranslatedCSNodeString;
+#PressGang.TranslatedCSNodeString_AUD;
+
 # Any new records start at 100000
 ALTER TABLE PressGang.PropertyTagCategory AUTO_INCREMENT = 100000;
 
@@ -1036,3 +1345,27 @@ ALTER TABLE PressGang.Topic AUTO_INCREMENT = 100000;
 ALTER TABLE PressGang.Tag AUTO_INCREMENT = 100000;
 
 ALTER TABLE PressGang.REVINFO AUTO_INCREMENT = 100000;
+
+ALTER TABLE PressGang.ContentSpec AUTO_INCREMENT = 100000;;
+
+ALTER TABLE PressGang.ContentSpec_AUD AUTO_INCREMENT = 100000;;
+
+ALTER TABLE PressGang.ContentSpecNode AUTO_INCREMENT = 100000;;
+
+ALTER TABLE PressGang.ContentSpecNode_AUD AUTO_INCREMENT = 100000;;
+
+ALTER TABLE PressGang.CSNodeToCSNode AUTO_INCREMENT = 100000;;
+
+ALTER TABLE PressGang.CSNodeToCSNode_AUD AUTO_INCREMENT = 100000;;
+
+ALTER TABLE PressGang.CSNodeToPropertyTag AUTO_INCREMENT = 100000;;
+
+ALTER TABLE PressGang.CSNodeToPropertyTag_AUD AUTO_INCREMENT = 100000;;
+
+ALTER TABLE PressGang.ContentSpecToPropertyTag AUTO_INCREMENT = 100000;;
+
+ALTER TABLE PressGang.ContentSpecToPropertyTag_AUD AUTO_INCREMENT = 100000;;
+
+ALTER TABLE PressGang.ContentSpecToTag AUTO_INCREMENT = 100000;;
+
+ALTER TABLE PressGang.ContentSpecToTag_AUD AUTO_INCREMENT = 100000;;
