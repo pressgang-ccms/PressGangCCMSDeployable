@@ -71,7 +71,7 @@ class MySqlH2Conversion {
     }
 
     def static process(line) {
-        return convertHexNumbers(changeSingleQuoteEscaping(line))
+        changeBitRepresentation(convertHexNumbers(changeSingleQuoteEscaping(line)))
     }
 
     def static changeSingleQuoteEscaping(line) {
@@ -79,6 +79,10 @@ class MySqlH2Conversion {
     }
 
     def static convertHexNumbers(line) {
-        return line.replaceAll(~"0x([A-Fa-f0-9]+)", { match, num -> "'$num'" })
+        line.replaceAll(~"0x([A-Fa-f0-9]+)", { match, num -> "'$num'" })
+    }
+
+    def static changeBitRepresentation(line) {
+        line.replaceAll(~"b'0'", { '0' })
     }
 }
