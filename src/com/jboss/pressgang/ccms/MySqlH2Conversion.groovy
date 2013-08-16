@@ -75,7 +75,7 @@ class MySqlH2Conversion {
     }
 
     def static changeSingleQuoteEscaping(line) {
-        line.replaceAll(~"\\\\\\'", { "''" })
+        line.replaceAll(~"\\\\\\'", "''") //TODO deal with special case in Regex strings
     }
 
     def static convertHexNumbers(line) {
@@ -83,6 +83,24 @@ class MySqlH2Conversion {
     }
 
     def static changeBitRepresentation(line) {
-        line.replaceAll(~"b'0'", { '0' })
+        line.replaceAll(~"b'0'", "0")
     }
+
+    def static removeKeyRanges(line) {
+        //TODO
+    }
+
+    def static removeCharacterSets(line) {
+        //TODO
+    }
+
+    def static removeIndexes(line) {
+        //TODO remove indexes on BLOBS, CLOBS and TEXT fields
+    }
+
+    def static ensureIndexNamesUnique(line) {
+        //TODO
+    }
+
+    //TODO reorder data imports to avoid referential integrity errors
 }
