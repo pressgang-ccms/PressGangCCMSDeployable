@@ -135,6 +135,7 @@ class MySqlH2Conversion {
         resultFile.createNewFile()
         tempFile.createNewFile()
         def tableMap = [:]
+        def insertMap = [:]
         def processingTable = false
         def lastLineEmpty = false
         def tableName = ""
@@ -152,17 +153,20 @@ class MySqlH2Conversion {
                 tableMap.put(tableName, line + "\n")
             } else {
                 def newLine = process(line, processingTable)
-                processingTable ? updateTableMap(tableMap, tableName, newLine) : tempFile.append(newLine + "\n")
+                if (processingTable) {
+                    updateMap(tableMap, tableName, newLine)
+                } else if (isInsert(newLine)) {
+                    def insertTableName = newLine.find(~/\s*INSERT INTO "(\w+)".*/) { match, name -> name }
+                    updateMap(insertMap, insertTableName, newLine)
+                } else {
+                    tempFile.append(newLine + "\n")
+                }
             }
             if (!processingTable && !isComment(line)) lastLineEmpty = line.isEmpty()
             return
         }
-        if (!tableMap.isEmpty()) {
-            def sortedTables = tableMap.sort { a, b -> getIndex(tableOrder, a.key) <=> getIndex(tableOrder, b.key) }
-            for (String table : sortedTables.keySet()) {
-                resultFile.append(tableMap.get(table) + "\n\n")
-            }
-        }
+        appendSortedMapValues(resultFile, tableMap)
+        appendSortedMapValues(resultFile, insertMap)
         resultFile.append(tempFile.getBytes())
         tempFile.delete()
     }
@@ -176,12 +180,25 @@ class MySqlH2Conversion {
         tableName ?: ""
     }
 
+    def static isInsert(line) {
+        line.matches(~/\s*INSERT INTO.*/)
+    }
+
+    def static appendSortedMapValues(file, map) {
+        if (!map.isEmpty()) {
+            def sorted = map.sort { a, b -> getIndex(tableOrder, a.key) <=> getIndex(tableOrder, b.key) }
+            for (String table : sorted.keySet()) {
+                file.append(map.get(table) + "\n\n")
+            }
+        }
+    }
+
     def static isTableEnd(line) {
         line.matches(~"\\/\\*!40101 SET character_set_client \\= \\@saved_cs_client \\*\\/;")
     }
 
-    def static updateTableMap(map, name, line) {
-        map.put(name, map.get(name) + line + "\n")
+    def static updateMap(map, name, line) {
+        map.put(name, (map.get(name) ?: "") + line + "\n")
     }
 
     def static isComment(line) {
@@ -247,6 +264,4 @@ class MySqlH2Conversion {
         }
         line
     }
-
-    //TODO reorder data imports to avoid referential integrity errors
 }
