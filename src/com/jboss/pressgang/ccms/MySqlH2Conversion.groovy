@@ -46,13 +46,17 @@ class MySqlH2Conversion {
             return
         }
         if (!tableMap.isEmpty()) {
-            def sortedTables = tableMap.sort { a, b -> tableOrder.indexOf(a.key) <=> tableOrder.indexOf(b.key) }
+            def sortedTables = tableMap.sort { a, b -> getIndex(tableOrder, a.key) <=> getIndex(tableOrder, b.key) }
             for (String table : sortedTables.keySet()) {
                 resultFile.append(tableMap.get(table) + "\n\n")
             }
         }
         resultFile.append(tempFile.getBytes())
         tempFile.delete()
+    }
+
+    def static getIndex(list, key) {
+        list.indexOf(key) == -1 ? list.size() : list.indexOf(key)
     }
 
     def static getTableName(String line) {
