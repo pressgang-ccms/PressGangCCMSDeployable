@@ -190,7 +190,7 @@ class MySqlH2Conversion {
 
     def static process(String line, boolean processingTable) {
         def result = changeBitRepresentation(convertHexNumbers(changeSingleQuoteEscaping(line)))
-        processingTable ? processIndexes(removeCharacterSets(removeKeyRanges(result))) : result
+        processingTable ? processIndexes(removeCharacterSets(removeCollate(removeKeyRanges(result)))) : result
     }
 
     def static changeSingleQuoteEscaping(String line) {
@@ -211,6 +211,10 @@ class MySqlH2Conversion {
 
     def static removeCharacterSets(String line) {
         line.replaceFirst(/ CHARACTER SET \w+\b/, "")
+    }
+
+    def static removeCollate(String line) {
+        line.replaceFirst(/ COLLATE \w+\b/, "")
     }
 
     def static processIndexes(String line) {
