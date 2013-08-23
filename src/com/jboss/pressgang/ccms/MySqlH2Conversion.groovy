@@ -6,6 +6,11 @@ class MySqlH2Conversion {
     def static indexId = 0
     def static indexes = []
     def static notIndexable = [] as Set
+
+    // Confirm that all tables are listed by comparing the count returned by
+    // SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'database';
+    // with the line count here
+
     def final static tableOrder = [
             'DATABASECHANGELOGLOCK',
             'DATABASECHANGELOG',
@@ -17,9 +22,9 @@ class MySqlH2Conversion {
             'RelationshipTag',
             'RelationshipTag_AUD',
             'Role',
-            'RoleToRole',
             'RoleToRoleRelationship',
             'RoleToRoleRelationship_AUD',
+            'RoleToRole',
             'RoleToRole_AUD',
             'Role_AUD',
             'File',
@@ -123,7 +128,7 @@ class MySqlH2Conversion {
         }
         def (inputFile, resultFile, tempFile) = [args[0], new File("result.sql"), new File("temp.sql")]
         if (resultFile.exists()) {
-            for(def num = 1; resultFile.exists(); num++) {
+            for (def num = 1; resultFile.exists(); num++) {
                 resultFile = new File("result" + num + ".sql")
             }
         }
