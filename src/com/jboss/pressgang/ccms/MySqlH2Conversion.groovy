@@ -116,12 +116,14 @@ class MySqlH2Conversion {
             }
             // Ensure index name is unique within the database
             def thisIndex = line.find(indexPattern) { match, unique, index, name, fields, field -> return name }
-            while (indexes.contains(thisIndex)) {
-                def newIndex = thisIndex + indexId++
-                line = line.replaceAll(thisIndex, newIndex)
-                thisIndex = newIndex
+            def newIndex = thisIndex
+            while (indexes.contains(newIndex)) {
+                newIndex = thisIndex + indexId++
             }
-            indexes.add(thisIndex)
+            if (! newIndex.equals(thisIndex)) {
+                line = line.replaceFirst(thisIndex, newIndex)
+            }
+            indexes.add(newIndex)
         }
         line
     }
