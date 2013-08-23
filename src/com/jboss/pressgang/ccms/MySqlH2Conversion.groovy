@@ -4,6 +4,8 @@ package com.jboss.pressgang.ccms
  */
 class MySqlH2Conversion {
     def static indexId = 0
+    def static indexes = []
+    def static notIndexable = [] as Set
     def final static tableOrder = ['DATABASECHANGELOGLOCK', 'DATABASECHANGELOG', 'REVINFO', 'File', 'File_AUD', 'StringConstants', 'StringConstants_AUD', 'BlobConstants', 'BlobConstants_AUD',
             'ImageFile', 'ImageFile_AUD', 'LanguageImage', 'LanguageImage_AUD', 'Topic', 'Topic_AUD', 'Tag', 'Tag_AUD', 'Category', 'Category_AUD', 'PropertyTag', 'PropertyTag_AUD', 'PropertyTagCategory',
             'PropertyTagCategory_AUD', 'Project', 'Project_AUD', 'User', 'User_AUD', 'ContentSpec', 'ContentSpec_AUD', 'ContentSpecNode', 'ContentSpecNode_AUD', 'TranslatedContentSpec', 'TranslatedContentSpec_AUD',
@@ -37,7 +39,7 @@ class MySqlH2Conversion {
                 tableName = getTableName(line)
                 tableMap.put(tableName, line + "\n")
             } else {
-                def newLine = process(line)
+                def newLine = process(line, processingTable)
                 processingTable ? updateTableMap(tableMap, tableName, newLine) : tempFile.append(newLine + "\n")
             }
             if (!processingTable && !isComment(line)) lastLineEmpty = line.isEmpty()
@@ -70,36 +72,58 @@ class MySqlH2Conversion {
         line.startsWith("--") || line.startsWith("/*")
     }
 
-    def static process(line) {
-        changeBitRepresentation(convertHexNumbers(changeSingleQuoteEscaping(line)))
+    def static process(String line, boolean processingTable) {
+        def result = changeBitRepresentation(convertHexNumbers(changeSingleQuoteEscaping(line)))
+        processingTable ? processIndexes(removeCharacterSets(removeKeyRanges(result))) : result
     }
 
-    def static changeSingleQuoteEscaping(line) {
-        line.replaceAll(~"\\\\\\'", "''") //TODO deal with special case in Regex strings
+    def static changeSingleQuoteEscaping(String line) {
+        line.replaceAll(~"\\\\\\'", "''")
     }
 
-    def static convertHexNumbers(line) {
+    def static convertHexNumbers(String line) {
         line.replaceAll(~"0x([A-Fa-f0-9]+)", { match, num -> "'$num'" })
     }
 
-    def static changeBitRepresentation(line) {
+    def static changeBitRepresentation(String line) {
         line.replaceAll(~"b'0'", "0")
     }
 
-    def static removeKeyRanges(line) {
-        //TODO
+    def static removeKeyRanges(String line) {
+        (line ==~ /\s*(UNIQUE )?(KEY|INDEX).*\((("\w+"(\([0-9]+\))?,?)+)\).*/) ? line.replaceAll(/\([0-9]+\)/, "") : line
     }
 
-    def static removeCharacterSets(line) {
-        //TODO
+    def static removeCharacterSets(String line) {
+        line.replaceFirst(/ CHARACTER SET \w+\b/, "")
     }
 
-    def static removeIndexes(line) {
-        //TODO remove indexes on BLOBS, CLOBS and TEXT fields
-    }
-
-    def static ensureIndexNamesUnique(line) {
-        //TODO
+    def static processIndexes(String line) {
+        // Add to nonIndexable list if type is a blob or text field
+        def blobTextPattern = ~/\s*"(\w+)" (blob|tinyblob|mediumblob|longblob|text|tinytext|mediumtext|longtext)\b.*/
+        if (line.matches(blobTextPattern)) {
+            notIndexable.add(line.find(blobTextPattern) { match, name, type -> name })
+            return line
+        }
+        def indexPattern = ~/\s*(UNIQUE )?(KEY|INDEX) "(\w+)" \((("\w+",?)+)\).*/
+        if (line ==~ indexPattern) {
+            // Remove line if index is for a blob or text field
+            def keyFields = []
+            def keyFieldsString = line.find(indexPattern) { match, unique, index, name, fields, field -> return fields }
+            keyFields.addAll(keyFieldsString.split(','))
+            keyFields = keyFields.collectAll { keyField -> keyField.substring(1, keyField.length() - 1) }
+            for (String keyField : keyFields) {
+                if (notIndexable.contains(keyField)) return ""
+            }
+            // Ensure index name is unique within the database
+            def thisIndex = line.find(indexPattern) { match, unique, index, name, fields, field -> return name }
+            while (indexes.contains(thisIndex)) {
+                def newIndex = thisIndex + indexId++
+                line = line.replaceAll(thisIndex, newIndex)
+                thisIndex = newIndex
+            }
+            indexes.add(thisIndex)
+        }
+        line
     }
 
     //TODO reorder data imports to avoid referential integrity errors
