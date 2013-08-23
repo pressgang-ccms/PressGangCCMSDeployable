@@ -241,7 +241,7 @@ class MySqlH2Conversion {
                 newIndex = thisIndex + indexId++
             }
             if (!newIndex.equals(thisIndex)) {
-                line = line.replaceFirst(thisIndex, newIndex)
+                line = line.replaceFirst('"' + thisIndex + '"', '"' + newIndex + '"')
             }
             indexes.add(newIndex)
         }
