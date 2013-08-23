@@ -6,6 +6,11 @@ class MySqlH2Conversion {
     def static indexId = 0
     def static indexes = []
     def static notIndexable = [] as Set
+    
+    // Confirm that all tables are listed by comparing the count returned by
+    // SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'database';
+    // with the line count here
+    
     def final static tableOrder = [
     	'DATABASECHANGELOGLOCK', 
     	'DATABASECHANGELOG', 
